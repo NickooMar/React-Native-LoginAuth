@@ -19,6 +19,9 @@ import { useFonts } from "expo-font";
 import BubbleBackground from "../../assets/Images/blob-scene-haikei.png";
 import registerIcon from "../../assets/Images/register_icon.png";
 
+// Navigation
+import { useNavigation } from "@react-navigation/native";
+
 // Toast Messages
 import Toast from "react-native-toast-message";
 
@@ -26,6 +29,8 @@ import Toast from "react-native-toast-message";
 import { handleCreateUser } from "../../api/authRequests";
 
 const RegisterScreen = () => {
+  const navigation = useNavigation();
+
   const [loadFonts] = useFonts({
     Montserrat_Black: require("../../assets/Fonts/Montserrat-Black.ttf"),
     Montserrat_Bold: require("../../assets/Fonts/Montserrat-Bold.ttf"),
@@ -38,23 +43,30 @@ const RegisterScreen = () => {
     Montserrat_Thin: require("../../assets/Fonts/Montserrat-Thin.ttf"),
   });
 
-  // Toasts
+  // Toasts Messages
   const successToast = () => {
     Toast.show({
       type: "success",
       text1: "Register Successfully done",
       text2: `Welcome ${username} 👋`,
-      autoHide: true,
-      visibilityTime: 3000,
+      visibilityTime: 5000,
     });
   };
-  const errorToast = () => {
+  const validationErrorToast = () => {
     Toast.show({
       type: "error",
       text1: "Ops! Check if every field is valid",
+      text2:
+        "Try Again 🚫, username and password must have a minimum of 4 characters",
+      visibilityTime: 5000,
+    });
+  };
+  const duplicatedErrorToast = () => {
+    Toast.show({
+      type: "error",
+      text1: "Ops! username is already taken",
       text2: "Try Again 🚫",
-      visibilityTime: 3000,
-      autoHide: true,
+      visibilityTime: 5000,
     });
   };
 
@@ -65,18 +77,28 @@ const RegisterScreen = () => {
 
   if (!loadFonts) return null;
 
-  const handleSubmit = async (username, password) => {
+  const handleSubmit = async () => {
     if (
       !password ||
       !username ||
       !confirmPassword ||
       password != confirmPassword ||
-      username.length < 3 ||
-      password.length < 3
+      username.length < 4 ||
+      password.length < 4
     ) {
-      errorToast();
+      validationErrorToast();
     } else {
-      await handleCreateUser(username, password);
+      try {
+        await handleCreateUser(username, password);
+        successToast();
+        navigation.navigate("Login");
+      } catch (error) {
+        console.log(error);
+        duplicatedErrorToast();
+        setUsername("");
+        setPassword("");
+        setConfirmPassword("");
+      }
     }
   };
 
@@ -162,11 +184,16 @@ const RegisterScreen = () => {
               <Button
                 icon={registerIcon}
                 mode="contained"
-                onPress={() => handleSubmit(username, password)}
+                onPress={() => handleSubmit()}
                 style={styles.cardButton}
               >
                 Sign Up
               </Button>
+              <TouchableOpacity onPress={() => navigation.navigate("Login")}>
+                <Text style={styles.LoginRedirectText}>
+                  ¿Ya tienes una cuenta?
+                </Text>
+              </TouchableOpacity>
             </View>
           </View>
         </ImageBackground>
@@ -216,6 +243,11 @@ const styles = StyleSheet.create({
   cardButton: {
     marginTop: 15,
     width: 200,
-    marginBottom: 30,
+    marginBottom: 20,
+  },
+  LoginRedirectText: {
+    fontSize: 16,
+    color: "#533EA8",
+    paddingBottom: 20,
   },
 });
