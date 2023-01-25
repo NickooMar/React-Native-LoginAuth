@@ -22,13 +22,13 @@ import { useFonts } from "expo-font";
 import BubbleBackground from "../../assets/Images/blob-scene-haikei.png";
 import loginIcon from "../../assets/Images/login-icon.png";
 
-// API Handler
-import { handleLoginUser } from "../../api/authRequests";
-
 // Toast Messages
 import Toast from "react-native-toast-message";
 
-// Context Auth Hook
+// Auth
+import * as SecureStore from "expo-secure-store";
+
+// Context
 import useAuth from "../../hooks/useAuth";
 
 const LoginScreen = () => {
@@ -51,7 +51,7 @@ const LoginScreen = () => {
   const [username, setUsername] = useState("");
 
   // Auth Hook
-  const { setAuth } = useAuth();
+  const { signIn } = useAuth();
 
   if (!loadFonts) return null;
 
@@ -61,7 +61,7 @@ const LoginScreen = () => {
       text1: "Ops! Check if every field is valid",
       text2:
         "Try Again 🚫, username and password must have a minimum of 4 characters",
-      visibilityTime: 5000,
+      visibilityTime: 4000,
     });
   };
 
@@ -70,7 +70,7 @@ const LoginScreen = () => {
       type: "error",
       text1: "Ops! Username or password are incorrects",
       text2: "Try Again 🚫",
-      visibilityTime: 5000,
+      visibilityTime: 4000,
     });
   };
 
@@ -79,7 +79,7 @@ const LoginScreen = () => {
       type: "error",
       text1: "Ops! Unauthorized",
       text2: "You're not allowed to access! 🚫",
-      visibilityTime: 5000,
+      visibilityTime: 4000,
     });
   };
 
@@ -88,7 +88,7 @@ const LoginScreen = () => {
       type: "error",
       text1: "Ops! Something happend",
       text2: "Try again!🚫",
-      visibilityTime: 5000,
+      visibilityTime: 4000,
     });
   };
 
@@ -97,7 +97,7 @@ const LoginScreen = () => {
       type: "success",
       text1: `You're now Logged In!`,
       text2: `Welcome ${username} 👋`,
-      visibilityTime: 5000,
+      visibilityTime: 4000,
     });
   };
 
@@ -106,9 +106,7 @@ const LoginScreen = () => {
       validationErrorToast();
     }
     try {
-      const response = await handleLoginUser(username, password);
-      const accessToken = response?.accessToken;
-      setAuth({ username, accessToken });
+      await signIn(username, password);
       successLoginToast();
     } catch (error) {
       if (error?.response?.status === 400) {

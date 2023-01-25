@@ -25,8 +25,7 @@ import { useNavigation } from "@react-navigation/native";
 // Toast Messages
 import Toast from "react-native-toast-message";
 
-// API Handler
-import { handleCreateUser } from "../../api/authRequests";
+import useAuth from "../../hooks/useAuth";
 
 const RegisterScreen = () => {
   const navigation = useNavigation();
@@ -69,11 +68,21 @@ const RegisterScreen = () => {
       visibilityTime: 5000,
     });
   };
+  const connectionErrorToast = () => {
+    Toast.show({
+      type: "error",
+      text1: "Ops! Something went wrong!",
+      text2: "Try Again 🚫",
+      visibilityTime: 5000,
+    });
+  };
 
   const [hidePass, setHidePass] = useState(true);
   const [password, setPassword] = useState("");
   const [username, setUsername] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+
+  const { signUp } = useAuth();
 
   if (!loadFonts) return null;
 
@@ -89,15 +98,20 @@ const RegisterScreen = () => {
       validationErrorToast();
     } else {
       try {
-        await handleCreateUser(username, password);
+        await signUp(username, password);
         successToast();
         navigation.navigate("Login");
       } catch (error) {
         console.log(error);
-        duplicatedErrorToast();
-        setUsername("");
-        setPassword("");
-        setConfirmPassword("");
+        if (error?.response?.status === 409) {
+          duplicatedErrorToast();
+          setUsername("");
+          setPassword("");
+          setConfirmPassword("");
+        } else {
+          console.log(error);
+          connectionErrorToast();
+        }
       }
     }
   };

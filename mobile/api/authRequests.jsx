@@ -1,6 +1,10 @@
 import axios from "axios";
 
-const authURL = "http://10.0.2.2:4000/user";
+// const authURL = "http://10.0.2.2:4000/user";
+const authURL =
+  Platform.OS === "android"
+    ? "http://10.0.2.2:4000/user"
+    : "http://localhost:4000/user";
 
 export const handleCreateUser = async (username, password) => {
   await axios.post(
