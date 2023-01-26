@@ -8,11 +8,11 @@ import * as SecureStore from "expo-secure-store";
 import useAuth from "../../hooks/useAuth";
 
 const HomeScreen = () => {
-  const auth = useAuth();
+  const { singOut } = useAuth();
 
   return (
     <View>
-      <Button onPress={auth.singOut} style={{ marginTop: 40 }}>
+      <Button onPress={singOut} style={{ marginTop: 40 }}>
         Logout
       </Button>
     </View>

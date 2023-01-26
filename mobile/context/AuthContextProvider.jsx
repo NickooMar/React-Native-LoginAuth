@@ -9,17 +9,23 @@ const AuthContext = createContext({});
 export const AuthProvider = ({ children }) => {
   const [authData, setAuthData] = useState({});
 
+  const getToken = async () => {
+    const result = await SecureStore.getItemAsync("token");
+    return result;
+  };
+
   const signIn = async (username, password) => {
     const response = await handleLoginUser(username, password);
     const userToken = response?.accessToken;
 
-    // await SecureStore.setItemAsync("token", userToken);
-
     setAuthData({ token: userToken });
+
+    await SecureStore.setItemAsync("token", userToken);
   };
 
   const singOut = async () => {
     setAuthData(undefined);
+    await SecureStore.deleteItemAsync("token");
   };
 
   const signUp = async (username, password) => {
@@ -31,8 +37,9 @@ export const AuthProvider = ({ children }) => {
       value={{
         signIn,
         singOut,
-        authData,
         signUp,
+        authData,
+        getToken,
       }}
     >
       {children}
