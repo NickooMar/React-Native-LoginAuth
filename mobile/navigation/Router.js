@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 import { AppStack } from "./AppStack";
 import { AuthStack } from "./AuthStack";
@@ -11,13 +11,19 @@ export const Router = () => {
   const [token, setToken] = useState();
   const { authData } = useAuth();
 
-  const { getToken } = useAuth();
+  const { showToken } = useAuth();
 
-  getToken().then((res) => setToken(res));
+  useEffect(() => {
+    showToken().then((res) => {
+      setToken(res);
+    });
+  }, []);
+
+  console.log(authData?.token, token);
 
   return (
     <NavigationContainer>
-      {token ? <AppStack /> : <AuthStack />}
+      {authData?.token || token ? <AppStack /> : <AuthStack />}
     </NavigationContainer>
   );
 };

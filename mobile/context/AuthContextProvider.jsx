@@ -9,7 +9,7 @@ const AuthContext = createContext({});
 export const AuthProvider = ({ children }) => {
   const [authData, setAuthData] = useState({});
 
-  const getToken = async () => {
+  const showToken = async () => {
     const result = await SecureStore.getItemAsync("token");
     return result;
   };
@@ -39,7 +39,7 @@ export const AuthProvider = ({ children }) => {
         singOut,
         signUp,
         authData,
-        getToken,
+        showToken,
       }}
     >
       {children}
