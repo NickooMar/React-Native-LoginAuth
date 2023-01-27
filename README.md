@@ -1,6 +1,6 @@
 # React-Native-LoginAuth
 
-React Native application made with expo for the Mobile Interface, NodeJs for the Backend and MongoDB to storage the users.
+React Native application made with expo for the Mobile Interface, NodeJs for the Backend and MongoDB as database.
 
 LoginScreen / DefaultScreen 
 
